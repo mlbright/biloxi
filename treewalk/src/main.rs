@@ -6,7 +6,7 @@ fn main() {
     if args.len() > 2 {
         println!("Usage: biloxi [script]");
     } else if args.len() == 2 {
-        run_file(std::path::Path::new(&args[0]));
+        run_file(&std::path::Path::new(&args[1]));
     } else {
         run_prompt();
     }
