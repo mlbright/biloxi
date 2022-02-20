@@ -1,7 +1,7 @@
-use std::fs::File;
-use std::io::prelude::*;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
+use std::fs::File;
+use std::io::prelude::*;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -27,11 +27,10 @@ fn run_prompt() {
     // `()` can be used when no completer is required
     let mut rl = Editor::<()>::new();
     loop {
-        let readline = rl.readline(">> ");
+        let readline = rl.readline("> ");
         match readline {
             Ok(line) => {
-                rl.add_history_entry(line.as_str());
-                println!("Line: {}", line);
+                run(line.as_str());
             }
             Err(ReadlineError::Interrupted) => {
                 println!("CTRL-C");
@@ -49,6 +48,6 @@ fn run_prompt() {
     }
 }
 
-fn run(program: &str) {
-    println!("program: {}", program);
+fn run(source: &str) {
+    println!("program: {}", source);
 }
