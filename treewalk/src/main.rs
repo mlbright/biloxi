@@ -3,6 +3,10 @@ use rustyline::Editor;
 use std::fs::File;
 use std::io::prelude::*;
 
+mod scanner;
+mod token;
+mod token_type;
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     match args.len() {

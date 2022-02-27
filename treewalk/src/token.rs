@@ -1,6 +1,5 @@
-use TokenType;
-
-struct Token {
+use crate::token_type::TokenType;
+pub struct Token {
     type_: TokenType,
     lexeme: String,
     literal: String,
@@ -9,14 +8,14 @@ struct Token {
 
 impl Token {
     fn to_string(&self) -> String {
-        format!("{} {} {}", this.type_, this.lexeme, this.literal)
+        format!("{:?} {} {}", self.type_, self.lexeme, self.literal)
     }
 
-    fn new(type_: TokenType, lexeme: &str, literal: &str, line: int) -> Self {
+    fn new(type_: TokenType, lexeme: &str, literal: &str, line: i32) -> Self {
         Token {
             type_,
-            lexeme,
-            literal,
+            lexeme: lexeme.to_string(),
+            literal: literal.to_string(),
             line,
         }
     }
