@@ -3,7 +3,7 @@ pub struct Token {
     type_: TokenType,
     lexeme: String,
     literal: String,
-    line: i32,
+    line: usize,
 }
 
 impl Token {
@@ -11,7 +11,7 @@ impl Token {
         format!("{:?} {} {}", self.type_, self.lexeme, self.literal)
     }
 
-    fn new(type_: TokenType, lexeme: &str, literal: &str, line: i32) -> Self {
+    pub fn new(type_: TokenType, lexeme: &str, literal: &str, line: usize) -> Self {
         Token {
             type_,
             lexeme: lexeme.to_string(),

@@ -1,7 +1,7 @@
 use crate::token::Token;
-
+use crate::token_type::TokenType;
 struct Scanner {
-    source: String,
+    source: Vec<char>,
     tokens: Vec<Token>,
     start: usize,
     current: usize,
@@ -11,24 +11,44 @@ struct Scanner {
 impl Scanner {
     fn new(source: &str) -> Self {
         Scanner {
-            source: source.to_string(),
+            source: source.chars().collect(),
             tokens: vec![],
-            start: 1,
-            current: 1,
+            start: 0,
+            current: 0,
             line: 1,
         }
     }
 
-    fn scan_tokens() -> Vec<Token> {
-        while !is_at_end() {
-            start = current;
-            scan_token();
+    fn scan_tokens(&self) -> Vec<Token> {
+        while !self.is_at_end() {
+            self.start = self.current;
+            self.scan_token();
         }
-        tokens.add(Token::new(TokenType::Eof, "", "", line));
-        return tokens;
+        self.tokens.push(Token::new(TokenType::Eof, "", "", self.line));
+
+        return self.tokens;
     }
 
     fn is_at_end(&self) -> bool {
         return self.current >= self.source.len();
+    }
+
+    fn scan_token(&self) {
+        match self.advance() {
+            '(' => self.add_token(TokenType::LeftParen),
+            _ => panic!("Unmatched something or other"),
+        }
+    }
+
+    fn advance(&self) -> char {
+        self.source[self.current+1]
+    }
+
+    fn add_token(&self, type_: TokenType, literal: Option<String>) {
+        let text = self.source[self.start:self.current];
+        match literal {
+            Some(s) => self.tokens.add(Token::new(type_, &text, literal, self.line)),
+            None => self.tokens.add(Token::new(type_, None)),
+        }
     }
 }
