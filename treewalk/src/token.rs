@@ -4,7 +4,7 @@ use crate::token_type::TokenType;
 pub struct Token {
     type_: TokenType,
     lexeme: String,
-    literal: Option<String>,
+    literal: Option<crate::scanner::Literal>,
     line: usize,
 }
 
@@ -14,15 +14,20 @@ impl Token {
             "{:?} {} {}",
             self.type_,
             self.lexeme,
-            self.literal.as_ref().unwrap_or(&"default".to_string())
+            self.literal.as_ref().unwrap(),
         )
     }
 
-    pub fn new(type_: TokenType, lexeme: &str, literal: Option<Literal>, line: usize) -> Self {
+    pub fn new(
+        type_: TokenType,
+        lexeme: &str,
+        literal: Option<crate::scanner::Literal>,
+        line: usize,
+    ) -> Self {
         Token {
             type_,
             lexeme: lexeme.to_string(),
-            literal: Some(literal.unwrap_or("default").to_string()),
+            literal,
             line,
         }
     }

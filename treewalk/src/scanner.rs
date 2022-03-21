@@ -8,9 +8,19 @@ struct Scanner {
     line: usize,
 }
 
-enum Literal {
-    Object(String),
+#[derive(Clone)]
+pub enum Literal {
+    String(String),
     Number(f64),
+}
+
+impl std::fmt::Display for Literal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Literal::String(s) => write!(f, "{}", s),
+            Literal::Number(n) => write!(f, "{}", n),
+        }
+    }
 }
 
 impl Scanner {
@@ -103,7 +113,7 @@ impl Scanner {
         let number = &self.source[self.start..self.current]
             .parse::<f64>()
             .unwrap();
-        self.add_token(TokenType::Number, Literal::Number(number));
+        self.add_token(TokenType::Number, Some(Literal::Number(*number)));
     }
 
     fn peek_next(&mut self) -> char {
@@ -129,7 +139,7 @@ impl Scanner {
         self.advance(); // The closing ".
 
         let value = &self.source[self.start + 1..self.current - 1];
-        self.add_token(TokenType::String, Some(Literal::Object(value.to_string())));
+        self.add_token(TokenType::String, Some(Literal::String(value.to_string())));
     }
 
     fn advance(&mut self) -> char {
@@ -140,12 +150,9 @@ impl Scanner {
     fn add_token(&mut self, type_: TokenType, literal: Option<Literal>) {
         let text = &self.source[self.start..self.current];
         match literal {
-            Some(s) => self.tokens.push(Token::new(
-                type_,
-                text,
-                Some(Literal::Object(&s)),
-                self.line,
-            )),
+            Some(s) => self
+                .tokens
+                .push(Token::new(type_, text, Some(s), self.line)),
             None => self.tokens.push(Token::new(type_, text, None, self.line)),
         }
     }
