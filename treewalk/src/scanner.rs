@@ -46,6 +46,31 @@ impl Scanner {
             '+' => self.add_token(TokenType::Plus, None),
             ';' => self.add_token(TokenType::Semicolon, None),
             '*' => self.add_token(TokenType::Star, None),
+            '!' => match self.match_char('=') {
+                true => self.add_token(TokenType::BangEqual, None),
+                false => self.add_token(TokenType::Bang, None),
+            },
+            '=' => match self.match_char('=') {
+                true => self.add_token(TokenType::EqualEqual, None),
+                false => self.add_token(TokenType::Equal, None),
+            },
+            '<' => match self.match_char('=') {
+                true => self.add_token(TokenType::LessEqual, None),
+                false => self.add_token(TokenType::Less, None),
+            },
+            '>' => match self.match_char('=') {
+                true => self.add_token(TokenType::GreaterEqual, None),
+                false => self.add_token(TokenType::Greater, None),
+            },
+            '/' => {
+                if self.match_char('/') {
+                    while self.peek() != '\n' && !self.is_at_end() {
+                        self.advance();
+                    }
+                } else {
+                    self.add_token(TokenType::Slash, None);
+                }
+            }
             _ => {
                 crate::error(self.line, "Unexpected character.");
             }
@@ -64,6 +89,27 @@ impl Scanner {
                 .tokens
                 .push(Token::new(type_, text, Some(&s), self.line)),
             None => self.tokens.push(Token::new(type_, text, None, self.line)),
+        }
+    }
+
+    fn match_char(&mut self, c: char) -> bool {
+        if self.is_at_end() {
+            return false;
+        }
+
+        if self.source.chars().nth(self.current).unwrap_or('x') != c {
+            return false;
+        }
+
+        self.current += 1;
+        return true;
+    }
+
+    fn peek(&self) -> char {
+        if self.is_at_end() {
+            '\0'
+        } else {
+            self.source.chars().nth(self.current).unwrap_or('x')
         }
     }
 }
