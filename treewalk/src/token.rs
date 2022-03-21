@@ -18,7 +18,7 @@ impl Token {
         )
     }
 
-    pub fn new(type_: TokenType, lexeme: &str, literal: Option<&str>, line: usize) -> Self {
+    pub fn new(type_: TokenType, lexeme: &str, literal: Option<Literal>, line: usize) -> Self {
         Token {
             type_,
             lexeme: lexeme.to_string(),

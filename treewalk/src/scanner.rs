@@ -8,6 +8,11 @@ struct Scanner {
     line: usize,
 }
 
+enum Literal {
+    Object(String),
+    Number(f64),
+}
+
 impl Scanner {
     fn new(source: &str) -> Self {
         Scanner {
@@ -76,9 +81,36 @@ impl Scanner {
             '\r' => (),
             '\n' => self.line += 1,
             '"' => self.stringify(),
+            d if d.is_digit(10) => self.number(),
             _ => {
                 crate::error(self.line, "Unexpected character.");
             }
+        }
+    }
+
+    fn number(&mut self) {
+        while self.peek().is_digit(10) {
+            self.advance();
+        }
+
+        if self.peek() == '.' && self.peek_next().is_digit(10) {
+            self.advance();
+            while self.peek().is_digit(10) {
+                self.advance();
+            }
+        }
+
+        let number = &self.source[self.start..self.current]
+            .parse::<f64>()
+            .unwrap();
+        self.add_token(TokenType::Number, Literal::Number(number));
+    }
+
+    fn peek_next(&mut self) -> char {
+        if self.current + 1 >= self.source.len() {
+            '\0'
+        } else {
+            self.source.chars().nth(self.current + 1).unwrap_or('x')
         }
     }
 
@@ -97,7 +129,7 @@ impl Scanner {
         self.advance(); // The closing ".
 
         let value = &self.source[self.start + 1..self.current - 1];
-        self.add_token(TokenType::String, Some(value.to_string()));
+        self.add_token(TokenType::String, Some(Literal::Object(value.to_string())));
     }
 
     fn advance(&mut self) -> char {
@@ -105,12 +137,15 @@ impl Scanner {
         self.source.chars().nth(self.current).unwrap_or('x')
     }
 
-    fn add_token(&mut self, type_: TokenType, literal: Option<String>) {
+    fn add_token(&mut self, type_: TokenType, literal: Option<Literal>) {
         let text = &self.source[self.start..self.current];
         match literal {
-            Some(s) => self
-                .tokens
-                .push(Token::new(type_, text, Some(&s), self.line)),
+            Some(s) => self.tokens.push(Token::new(
+                type_,
+                text,
+                Some(Literal::Object(&s)),
+                self.line,
+            )),
             None => self.tokens.push(Token::new(type_, text, None, self.line)),
         }
     }
