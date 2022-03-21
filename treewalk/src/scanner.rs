@@ -1,6 +1,5 @@
 use crate::token::Token;
 use crate::token_type::TokenType;
-use std::collections::HashMap;
 
 struct Scanner {
     source: String,
@@ -8,7 +7,6 @@ struct Scanner {
     start: usize,
     current: usize,
     line: usize,
-    keywords: HashMap<String, TokenType>,
 }
 
 #[derive(Clone)]
@@ -28,32 +26,12 @@ impl std::fmt::Display for Literal {
 
 impl Scanner {
     fn new(source: &str) -> Self {
-        let keywords = HashMap::from([
-            ("and".to_string(), TokenType::And),
-            ("class".to_string(), TokenType::Class),
-            ("else".to_string(), TokenType::Else),
-            ("false".to_string(), TokenType::False),
-            ("for".to_string(), TokenType::For),
-            ("fun".to_string(), TokenType::Fun),
-            ("if".to_string(), TokenType::If),
-            ("nil".to_string(), TokenType::Nil),
-            ("or".to_string(), TokenType::Or),
-            ("print".to_string(), TokenType::Print),
-            ("return".to_string(), TokenType::Return),
-            ("super".to_string(), TokenType::Super),
-            ("this".to_string(), TokenType::This),
-            ("true".to_string(), TokenType::True),
-            ("var".to_string(), TokenType::Var),
-            ("while".to_string(), TokenType::While),
-        ]);
-
         Scanner {
             source: source.to_string(),
             tokens: vec![],
             start: 0,
             current: 0,
             line: 1,
-            keywords,
         }
     }
 
@@ -132,9 +110,24 @@ impl Scanner {
             self.advance();
         }
         let text = &self.source[self.start..self.current];
-        match self.keywords.get(text) {
-            None => self.add_token(TokenType::Identifier, None),
-            Some(t) => self.add_token(t, None),
+        match text {
+            "and" => self.add_token(TokenType::And, None),
+            "class" => self.add_token(TokenType::Class, None),
+            "else" => self.add_token(TokenType::Else, None),
+            "false" => self.add_token(TokenType::False, None),
+            "for" => self.add_token(TokenType::For, None),
+            "fun" => self.add_token(TokenType::Fun, None),
+            "if" => self.add_token(TokenType::If, None),
+            "nil" => self.add_token(TokenType::Nil, None),
+            "or" => self.add_token(TokenType::Or, None),
+            "print" => self.add_token(TokenType::Print, None),
+            "return" => self.add_token(TokenType::Return, None),
+            "super" => self.add_token(TokenType::Super, None),
+            "this" => self.add_token(TokenType::This, None),
+            "true" => self.add_token(TokenType::True, None),
+            "var" => self.add_token(TokenType::Var, None),
+            "while" => self.add_token(TokenType::While, None),
+            _ => self.add_token(TokenType::Identifier, None),
         }
     }
 
