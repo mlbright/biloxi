@@ -56,10 +56,10 @@ fn run(source: &str) {
     println!("program: {}", source);
 }
 
-fn error(line: i32, message: &str) {
+pub fn error(line: usize, message: &str) {
     report(line, "", message);
 }
 
-fn report(line: i32, error_location: &str, message: &str) {
+fn report(line: usize, error_location: &str, message: &str) {
     println!("[line {}] error {}: {}", line, error_location, message);
 }

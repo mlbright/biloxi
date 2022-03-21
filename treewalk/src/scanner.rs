@@ -37,12 +37,24 @@ impl Scanner {
     fn scan_token(&mut self) {
         match self.advance() {
             '(' => self.add_token(TokenType::LeftParen, None),
-            _ => panic!("Unmatched something or other"),
+            ')' => self.add_token(TokenType::RightParen, None),
+            '{' => self.add_token(TokenType::LeftBrace, None),
+            '}' => self.add_token(TokenType::RightBrace, None),
+            ',' => self.add_token(TokenType::Comma, None),
+            '.' => self.add_token(TokenType::Dot, None),
+            '-' => self.add_token(TokenType::Minus, None),
+            '+' => self.add_token(TokenType::Plus, None),
+            ';' => self.add_token(TokenType::Semicolon, None),
+            '*' => self.add_token(TokenType::Star, None),
+            _ => {
+                crate::error(self.line, "Unexpected character.");
+            }
         }
     }
 
-    fn advance(&self) -> char {
-        self.source.chars().nth(self.current + 1).unwrap_or('x')
+    fn advance(&mut self) -> char {
+        self.current += 1;
+        self.source.chars().nth(self.current).unwrap_or('x')
     }
 
     fn add_token(&mut self, type_: TokenType, literal: Option<String>) {
