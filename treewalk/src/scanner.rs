@@ -1,7 +1,7 @@
 use crate::token::Token;
 use crate::token_type::TokenType;
 struct Scanner {
-    source: Vec<char>,
+    source: String,
     tokens: Vec<Token>,
     start: usize,
     current: usize,
@@ -11,7 +11,7 @@ struct Scanner {
 impl Scanner {
     fn new(source: &str) -> Self {
         Scanner {
-            source: source.chars().collect(),
+            source: source.to_string(),
             tokens: vec![],
             start: 0,
             current: 0,
@@ -19,36 +19,39 @@ impl Scanner {
         }
     }
 
-    fn scan_tokens(&self) -> Vec<Token> {
+    fn scan_tokens(&mut self) -> Vec<Token> {
         while !self.is_at_end() {
             self.start = self.current;
             self.scan_token();
         }
-        self.tokens.push(Token::new(TokenType::Eof, "", "", self.line));
+        self.tokens
+            .push(Token::new(TokenType::Eof, "", None, self.line));
 
-        return self.tokens;
+        return self.tokens.clone();
     }
 
     fn is_at_end(&self) -> bool {
         return self.current >= self.source.len();
     }
 
-    fn scan_token(&self) {
+    fn scan_token(&mut self) {
         match self.advance() {
-            '(' => self.add_token(TokenType::LeftParen),
+            '(' => self.add_token(TokenType::LeftParen, None),
             _ => panic!("Unmatched something or other"),
         }
     }
 
     fn advance(&self) -> char {
-        self.source[self.current+1]
+        self.source.chars().nth(self.current + 1).unwrap_or('x')
     }
 
-    fn add_token(&self, type_: TokenType, literal: Option<String>) {
-        let text = self.source[self.start:self.current];
+    fn add_token(&mut self, type_: TokenType, literal: Option<String>) {
+        let text = &self.source[self.start..self.current];
         match literal {
-            Some(s) => self.tokens.add(Token::new(type_, &text, literal, self.line)),
-            None => self.tokens.add(Token::new(type_, None)),
+            Some(s) => self
+                .tokens
+                .push(Token::new(type_, text, Some(&s), self.line)),
+            None => self.tokens.push(Token::new(type_, text, None, self.line)),
         }
     }
 }

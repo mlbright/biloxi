@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TokenType {
     // Single-character tokens.
     LeftParen,
@@ -60,7 +60,7 @@ impl Token {
             "{:?} {} {}",
             self.token_type,
             self.lexeme,
-            self.literal.unwrap_or("".to_string())
+            self.literal.as_ref().unwrap_or(&"".to_string())
         )
     }
 }
