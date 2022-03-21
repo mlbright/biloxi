@@ -1,11 +1,14 @@
 use crate::token::Token;
 use crate::token_type::TokenType;
+use std::collections::HashMap;
+
 struct Scanner {
     source: String,
     tokens: Vec<Token>,
     start: usize,
     current: usize,
     line: usize,
+    keywords: HashMap<String, TokenType>,
 }
 
 #[derive(Clone)]
@@ -25,12 +28,32 @@ impl std::fmt::Display for Literal {
 
 impl Scanner {
     fn new(source: &str) -> Self {
+        let keywords = HashMap::from([
+            ("and".to_string(), TokenType::And),
+            ("class".to_string(), TokenType::Class),
+            ("else".to_string(), TokenType::Else),
+            ("false".to_string(), TokenType::False),
+            ("for".to_string(), TokenType::For),
+            ("fun".to_string(), TokenType::Fun),
+            ("if".to_string(), TokenType::If),
+            ("nil".to_string(), TokenType::Nil),
+            ("or".to_string(), TokenType::Or),
+            ("print".to_string(), TokenType::Print),
+            ("return".to_string(), TokenType::Return),
+            ("super".to_string(), TokenType::Super),
+            ("this".to_string(), TokenType::This),
+            ("true".to_string(), TokenType::True),
+            ("var".to_string(), TokenType::Var),
+            ("while".to_string(), TokenType::While),
+        ]);
+
         Scanner {
             source: source.to_string(),
             tokens: vec![],
             start: 0,
             current: 0,
             line: 1,
+            keywords,
         }
     }
 
@@ -91,10 +114,27 @@ impl Scanner {
             '\r' => (),
             '\n' => self.line += 1,
             '"' => self.stringify(),
+            'o' => {
+                if self.match_char('r') {
+                    self.add_token(TokenType::Or, None);
+                }
+            }
             d if d.is_digit(10) => self.number(),
+            c if c.is_alphanumeric() => self.identifier(),
             _ => {
                 crate::error(self.line, "Unexpected character.");
             }
+        }
+    }
+
+    fn identifier(&mut self) {
+        while self.peek().is_alphanumeric() {
+            self.advance();
+        }
+        let text = &self.source[self.start..self.current];
+        match self.keywords.get(text) {
+            None => self.add_token(TokenType::Identifier, None),
+            Some(t) => self.add_token(t, None),
         }
     }
 
